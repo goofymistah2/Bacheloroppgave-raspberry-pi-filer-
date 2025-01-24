@@ -22,11 +22,11 @@ class MQTT_handler():#en klasse som håndterer mqtt. Dette gjør det mye enklere
             sys.exit(1)
         self.client.on_message = self.on_message
     def json_decode(self,json_string):
-        print("i funksjonen i det minste") 
         try: 
-            decoded_json_dict = json.loads(json_string) 
+            decoded_json_dict = json.loads(json_string) #decoder mottat streng og lagrer i en dictionary
             for e in decoded_json_dict.keys(): 
-                self.json_data_dictionary[e] = decoded_json_dict[e]
+                self.json_data_dictionary[e] = decoded_json_dict[e] #lager en dictionary med de midlertidige verdiene, om flere en nyeste skal lagres håndteres ikke det i denne 
+                
         except: 
             print("failed, received message possibly not in expected json format") 
         

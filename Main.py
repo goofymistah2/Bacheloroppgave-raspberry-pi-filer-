@@ -19,10 +19,10 @@ mqtt_handler._subscribe("testTopic2")
 for i in range(0,100): 
     mqtt_handler.poll(0.1); 
     try: 
-        plot_handler.append_data(mqtt_handler.get_json_data_dictionary()["readings"])
+        plot_handler.append_data(mqtt_handler.get_json_data_dictionary()["readings"],"readings")
     except:
         print("no data to fetch")
-plot_handler.fixed_interval_plot(0, 10)
+plot_handler.fixed_interval_plot(0, 10,"readings")
 mqtt_handler._disconnect()
  
 
