@@ -4,7 +4,10 @@
 Created on Fri Jan 24 08:41:38 2025
 
 @author: bachauto
+
 """
+import matplotlib 
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from random import randrange
@@ -16,20 +19,16 @@ import threading
 import realtimeplot 
 class Plot_handler():
    
-    def __init__(self): 
-        self.animation = None;
-        self.data_dict = {}#må bevare en referanse til animasjonsvariabelen, ettersom FuncAnimation sendes som callback til update? 
-    def append_data(self,new_data,key): #her legges data til ønsket liste (spesifisert med key)
-        if (key in self.data_dict): #dette medfører et ganske tregt dictionary søk, kan endres senere for mer optimalisert kode
-            self.data_dict[key].extend(new_data)
-        else: 
-            self.data_dict[key]=(new_data)
-    def fixed_interval_plot(self,start,stop,key): #reading angir hvilken liste som skal plottes
+    def __init__(self,storage_dict): 
+        self.animation = None#må bevare en referanse til animasjonsvariabelen, ettersom FuncAnimation sendes som callback til update? 
+        self.storage_dict = storage_dict 
+    def fixed_interval_plot(self,key,start,stop): #reading angir hvilken liste som skal plottes
         x=[]
         y=[]
+        array = self.storage_dict.get_dict()[key]
         for i in range(start,stop): 
             x.append(i) 
-            y.append(self.data_dict[key][i]) 
+            y.append(array[i])
         plt.plot(x,y,'-') 
         plt.show()
             
@@ -40,16 +39,18 @@ class Plot_handler():
         x = []
         y = []
         ln, = ax.plot(x, y, '-')
+        i=0
         def update(frame):
-            x.append(x[-1] + 1)
-            try: 
-                y.append(self.data_dict[key][0]) 
-            except: 
-                print("no more data to be shown")
-                return
+            global i
+            x.append(i)
+            array = self.storage_dict.get_dict()[key]
+            
+            y.append(array[i])
+            
             ln.set_data(x, y) 
             ax.relim() #dynamisk 
             ax.autoscale_view() 
+            i+=1
             return ln,
         self.animation = FuncAnimation(fig, update, interval=500)
         plt.show()
