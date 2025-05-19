@@ -63,7 +63,7 @@ class Processing_handler:
                     current_max = amplitude
                     current_max_freq = fourier_transform["f_axis"][i][j]
         return cutoff_percentage*current_max_freq
-    def lowpass(self,order,cutoff, signals, sampling_frequency=200): 
+    def lowpass(self,order,cutoff, signals, sampling_frequency=2000): 
         
         print(type(order), type(cutoff))
         cutoff = cutoff/(sampling_frequency/2)
@@ -86,7 +86,35 @@ class Processing_handler:
                 return_signals.append(e)
         return return_signals
    
-    
+    def get_peaks(self,list_of_lists): 
+        filter_copy = list_of_lists.copy() 
+        filter_copy = self.lowpass(5, 20, filter_copy)
+        return_dict_list = {"peaks": [],"indices":[]}
+        for i in range(0, len(filter_copy)): 
+            current_peaks = []
+            current_peaks_indices = s.signal.find_peaks(list_of_lists[i]) 
+            indices = current_peaks_indices[0]
+            return_dict_list["indices"].append(indices)
+            for e in indices: 
+                current_peaks.append(filter_copy[i][e])
+            print(current_peaks)
+            return_dict_list["peaks"].append(current_peaks)
+        return return_dict_list
+    def find_dampening_function(self,list_of_lists,sampling_rate=1000): 
+        return_list = []
+        peaks = self.get_peaks(list_of_lists)
+        
+        for i in range(len(peaks["peaks"])): 
+            
+            x = np.array(peaks["indices"][i],dtype=float)
+            print(x)
+            for j in range(0,len(x)): 
+                x[j]=x[j]/sampling_rate
+            print(x)
+            current_peaks = peaks["peaks"][i]
+            m,b = np.polyfit(x,np.log(current_peaks),1)
+            return_list.append((m,b))
+        return return_list
     def remove_defunct(self,list_of_lists,threshold):
         return_list = []
        
